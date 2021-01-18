@@ -1,0 +1,22 @@
+package main
+
+import (
+    "DynamicQuerysGo/actions"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"reflect"
+	"time"
+
+	"github.com/gorilla/mux"
+)
+
+// FuncMap -
+type FuncMap map[string]interface{}
+
+// FuncsStorage -
+var FuncsStorage = FuncMap{}
+

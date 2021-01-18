@@ -1,0 +1,8 @@
+{
+    "functions": [
+        "CriarRegisto",
+        "ApagarRegisto",
+        "UpdateRegisto"
+    ], 
+    "package" : "generate"
+}
