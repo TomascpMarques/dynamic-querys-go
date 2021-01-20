@@ -18,5 +18,5 @@ type ActionBody struct {
 //				  and it's parameters.
 type FunctionPath struct {
 	FunctionCall   string                 `json:"call"`
-	FunctionParams map[string]interface{} `json:"params,omitempty"`
+	FunctionParams []interface{} `json:"params,omitempty"`
 }

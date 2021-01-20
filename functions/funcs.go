@@ -19,6 +19,6 @@ func Test3(num1, num2, num3 int) (int, int) {
 }
 
 // Test4 -
-func Test4(fields []string, id string) {
-	
+func Test4(fields []string, id string, i float64) ([]string, string, float64) {
+	return fields, id, i
 }

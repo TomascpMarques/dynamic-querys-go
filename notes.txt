@@ -2,6 +2,7 @@ package main
 
 import (
 	"DynamicQuerysGo/actions"
+	"DynamicQuerysGo/functions"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -34,24 +35,53 @@ func ActionHandler(rw http.ResponseWriter, r *http.Request) {
 	fmt.Println(i.ActionBody.Authentication)
 	fmt.Println(i.ActionBody.Functions[0].FunctionCall)
 	fmt.Println(i.ActionBody.Functions[0].FunctionParams)
-	fmt.Println(i.ActionBody.Functions[0].FunctionParams["fields"].([]interface{})[0])
-	fmt.Println("->", i.ActionBody.Functions[0].FunctionParams["id"])
+	fmt.Println(i.ActionBody.Functions[0].FunctionParams[0])
+	fmt.Println(i.ActionBody.Functions[0].FunctionParams[1])
 	fmt.Println(i.ActionBody.Returns)
 
-	rw.Write(body)
+	fmt.Printf("%v, %T\n", i.ActionBody.Functions[0].FunctionParams[0], i.ActionBody.Functions[0].FunctionParams[0])
+	fmt.Printf("%v, %T\n", i.ActionBody.Functions[0].FunctionParams[1], i.ActionBody.Functions[0].FunctionParams[1])
+	fmt.Printf("%v, %T\n", i.ActionBody.Functions[0].FunctionParams[2], i.ActionBody.Functions[0].FunctionParams[2])
+
+	a := reflect.TypeOf(i.ActionBody.Functions[0].FunctionParams[1])
+	i.ActionBody.Functions[0].FunctionParams[1] = reflect.ValueOf(i.ActionBody.Functions[0].FunctionParams[1]).Convert(a).Interface()
+	x := i.ActionBody.Functions[0].FunctionParams[1]
+	fmt.Printf("%v %T\n", x, x)
+
+	funcParams := convertStuff(i.ActionBody.Functions[0].FunctionParams)
+	fmt.Printf("-> %v %T %v\n", funcParams, funcParams, funcParams[1])
+
+	fmt.Println("<>>", reflect.ValueOf(i.ActionBody.Functions[0].FunctionParams))
+
+	FuncsStorage = map[string]interface{}{
+		"Test4": functions.Test4,
+	}
+
+	res, _ := CallFunc(i.ActionBody.Functions[0].FunctionCall, funcParams[1], funcParams[0], funcParams[2])
+	fmt.Println(res)
+
+	result, _ := json.MarshalIndent(&res, "", "  ")
+	rw.Write(result)
+}
+
+func convertStuff(x interface{}) []interface{} {
+	for i := 0; i < reflect.ValueOf(x).Len(); i++ {
+		typeOf := reflect.TypeOf(x.(interface{}))
+		x = reflect.ValueOf(x).Convert(typeOf).Interface()
+	}
+	return x.([]interface{})
 }
 
 func main() {
 
 	routerMux := mux.NewRouter()
 	routerMux.HandleFunc("/actions", ActionHandler)
-	http.Handle("/", routerMux)
 
 	srv := &http.Server{
 		Handler:      routerMux,
 		Addr:         "localhost:8000",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 2 * time.Second,
+		ReadTimeout:  5 * time.Second,
 	}
 	log.Fatal(srv.ListenAndServe())
 
