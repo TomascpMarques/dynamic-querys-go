@@ -11,12 +11,11 @@ type Action struct {
 type ActionBody struct {
 	Authentication string         `json:"auth,-"`
 	Functions      []FunctionPath `json:"func"`
-	Returns        []string       `json:"returns,omitempty"`
 }
 
 // FunctionPath - Defines the function to be called (it's path/name),
 //				  and it's parameters.
 type FunctionPath struct {
-	FunctionCall   string                 `json:"call"`
+	FunctionCall   string        `json:"call"`
 	FunctionParams []interface{} `json:"params,omitempty"`
 }

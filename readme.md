@@ -30,11 +30,6 @@ __Action of Read/Get type:__
                         ["name", "id"]
                     ]
                 }
-            ],
-            "returns": [
-                "success",
-                "id",
-                "nome"
-            ] // or nil
+            ]
         }
     }
