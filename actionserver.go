@@ -123,19 +123,19 @@ func convertToPrimitives(x []interface{}) ([]interface{}, error) {
 	return converted, nil
 }
 
-// GoActionsPORT - the port for where GoActions is located
-var GoActionsPORT = os.Getenv("ENV_GOACTIONS_PORT")
+// DQGPORT - the port for where DynamicQuerysGo is located
+var DQGPORT = os.Getenv("ENV_GOACTIONS_PORT")
 
-// DEFAULTGoActionsPORT - default port for GoActions
-const DEFAULTGoActionsPORT = "8000"
+// DEFAULTDQGPORT - default port for DynamicQuerysGo
+const DEFAULTDQGPORT = "8000"
 
-// GoActionsLogger - Logger for GoActions processes (can be stdout or a io.writer to a file)
-var GoActionsLogger = log.New(os.Stdout, "GoActions [*] ", log.LstdFlags)
+// DQGLogger - Logger for DynamicQuerysGo processes (can be stdout or a io.writer to a file)
+var DQGLogger = log.New(os.Stdout, "GoActions [*] ", log.LstdFlags)
 
 func main() {
 	// Checks for port configuration for the service
-	if GoActionsPORT == "" {
-		GoActionsPORT = DEFAULTGoActionsPORT
+	if DQGPORT == "" {
+		DQGPORT = DEFAULTDQGPORT
 	}
 
 	// flag setup fo graceful-shutdown
@@ -149,7 +149,7 @@ func main() {
 	// server setup
 	srv := &http.Server{
 		Handler:      routerMux,
-		Addr:         "localhost:" + GoActionsPORT,
+		Addr:         "localhost:" + DQGPORT,
 		WriteTimeout: 5 * time.Second,
 		ReadTimeout:  5 * time.Second,
 		IdleTimeout:  5 * time.Second,
@@ -158,7 +158,7 @@ func main() {
 	// prevent server blocking
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			GoActionsLogger.Println(err)
+			DQGLogger.Println(err)
 		}
 	}()
 
@@ -179,6 +179,6 @@ func main() {
 	// until the timeout deadline.
 	srv.Shutdown(ctx)
 
-	GoActionsLogger.Println("shutting down")
+	DQGLogger.Println("shutting down")
 	os.Exit(0)
 }

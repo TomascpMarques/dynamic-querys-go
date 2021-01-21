@@ -1,4 +1,4 @@
-module GoActions
+module DynamicQuerysGo
 
 go 1.15
 
