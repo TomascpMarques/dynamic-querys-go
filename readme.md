@@ -1,4 +1,4 @@
-# DynamicQuerysGo
+# DynamicQuerysGo / GoActions
 
 ## __Intro__
 
