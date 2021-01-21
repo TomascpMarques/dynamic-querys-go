@@ -13,7 +13,7 @@ func Test2(num1, num2, num3 int) int {
 }
 
 // Test3 -
-func Test3(num1, num2, num3 int) (int, int) {
+func Test3(num1, num2, num3 float64) (float64, float64) {
 	//fmt.Println(num1 * num2 * num3)
 	return num1 * num2 * num3, num1 * num2
 }

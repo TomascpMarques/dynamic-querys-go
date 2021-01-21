@@ -73,9 +73,10 @@ func ActionsHandler(rw http.ResponseWriter, r *http.Request) {
 
 	FuncsStorage = map[string]interface{}{
 		"Test4": functions.Test4,
+		"Test3": functions.Test3,
 	}
 
-	res, _ := CallFunc("Test4", funcParams)
+	res, _ := CallFunc(i.ActionBody.Functions[0].FunctionCall, funcParams)
 	fmt.Println(res)
 
 	result, _ := json.MarshalIndent(&funcParams, "", " ")
@@ -94,13 +95,6 @@ func convertToPrimitives(x []interface{}) ([]interface{}, error) {
 				newArray := make([]string, len(v.([]interface{})))
 				for j, u := range v.([]interface{}) {
 					newArray[j] = u.(string)
-				}
-				converted[k] = newArray
-				break
-			case "int32":
-				newArray := make([]int32, len(v.([]interface{})))
-				for j, u := range v.([]interface{}) {
-					newArray[j] = u.(int32)
 				}
 				converted[k] = newArray
 				break
@@ -136,7 +130,7 @@ var GoActionsPORT = os.Getenv("ENV_GOACTIONS_PORT")
 const DEFAULTGoActionsPORT = "8000"
 
 // GoActionsLogger - Logger for GoActions processes (can be stdout or a io.writer to a file)
-var GoActionsLogger = log.New(os.Stdout, "GoActions |> ", log.LstdFlags)
+var GoActionsLogger = log.New(os.Stdout, "GoActions [*] ", log.LstdFlags)
 
 func main() {
 	// Checks for port configuration for the service
