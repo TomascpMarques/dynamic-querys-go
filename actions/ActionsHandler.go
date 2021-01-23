@@ -43,12 +43,13 @@ func Handler(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	actionBody := strings.TrimSpace(action[7:])
-	auth := regexp.MustCompile(`auth: ".+"|auth: ".+" +`).FindAllStringSubmatch(actionBody, 9999)
-	funcNames := regexp.MustCompile(`"\w+":|"\w+":\s+`).FindAllStringSubmatch(actionBody, 9999)
-	funcArgs := regexp.MustCompile(`"\w+",\n|"\w+",|\[.+\]\n|\[.+\]\s+\n|\[.+\]\s+|\[.+\]`).FindAllStringSubmatch(actionBody, 9999)
+	auth := regexp.MustCompile(`auth: ".+"|auth: ".+" +`).FindAllStringSubmatch(actionBody, -1)
+	funcNames := regexp.MustCompile(`"\w+":|"\w+":\s+`).FindAllStringSubmatch(actionBody, -1)
+	funcArgs := regexp.MustCompile(`"\w+",\n|"\w+",|\[.+\]\n|\[.+\]\s+\n|\[.+\]\s+|\[.+\]|\d+,|\d+.\d+,`).FindAllStringSubmatch(actionBody, -1)
 
-	
 
+
+	// funcNames[0][0][1:len(funcNames[0][0])-2]
 	fmt.Println("| ->>", auth, "|", funcNames, funcArgs)
 	rw.Write([]byte(actionBody))
 }
