@@ -41,10 +41,14 @@ func Handler(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	actionBody := strings.TrimSpace(action[7:])
-	re := regexp.MustCompile(".+$\n|.+$")
-	test := re.FindAllStringSubmatch(actionBody, 6)
 
-	fmt.Println("| ->>", test)
+	actionBody := strings.TrimSpace(action[7:])
+	auth := regexp.MustCompile(`auth: ".+"|auth: ".+" +`).FindAllStringSubmatch(actionBody, 9999)
+	funcNames := regexp.MustCompile(`"\w+":|"\w+":\s+`).FindAllStringSubmatch(actionBody, 9999)
+	funcArgs := regexp.MustCompile(`"\w+",\n|"\w+",|\[.+\]\n|\[.+\]\s+\n|\[.+\]\s+|\[.+\]`).FindAllStringSubmatch(actionBody, 9999)
+
+	
+
+	fmt.Println("| ->>", auth, "|", funcNames, funcArgs)
 	rw.Write([]byte(actionBody))
 }

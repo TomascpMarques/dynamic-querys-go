@@ -37,7 +37,7 @@ func main() {
 	srv := &http.Server{
 		Handler:      routerMux,
 		Addr:         "localhost:" + DQGPORT,
-		WriteTimeout: 5 * time.Second,
+		WriteTimeout: 3 * time.Second,
 		ReadTimeout:  5 * time.Second,
 		IdleTimeout:  5 * time.Second,
 	}
