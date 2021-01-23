@@ -1,0 +1,6 @@
+action:
+    auth: "q543uo3th3hg2kikn2y91q4yhp1h"
+    funcs:
+        "GetItem": 
+            "Item123",
+            ["name","id"]

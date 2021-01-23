@@ -1,11 +1,13 @@
 package actions
 
 import (
-	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 )
 
 // DQGLogger - Logger for DynamicQuerysGo processes (can be stdout or a io.writer to a file)
@@ -31,21 +33,18 @@ func Handler(rw http.ResponseWriter, r *http.Request) {
 	// Gets the body from the request
 	requestBody, _ := ioutil.ReadAll(r.Body)
 
-	// Sets up the action, populate it with the r.body content
-	var i Action
-	err := json.Unmarshal(requestBody, &i)
-	if err != nil {
-		DQGLogger.Println(err)
-	}
+	action := strings.TrimSpace(string(requestBody))
 
-	DQGLogger.Printf("New action to handle | auth: %s | Called functions: %v|", i.ActionBody.Authentication, GetCalledFuncs(i.ActionBody.Functions))
-
-	returns, err := RunFunctionsGetReturns(i.ActionBody.Functions)
-	if err != nil {
-		DQGLogger.Println(err)
+	fmt.Println("\n", action)
+	if !strings.Contains(action[:7], "action:") {
+		fmt.Println("Erro: request sent is not an action")
+		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	actionBody := strings.TrimSpace(action[7:])
+	re := regexp.MustCompile(".+$\n|.+$")
+	test := re.FindAllStringSubmatch(actionBody, 6)
 
-	result, _ := json.MarshalIndent(&returns, "", "\t")
-	rw.Write(result)
+	fmt.Println("| ->>", test)
+	rw.Write([]byte(actionBody))
 }
