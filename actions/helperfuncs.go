@@ -5,22 +5,59 @@ import (
 	"reflect"
 )
 
+// CheckGivenParams - checks if the number of parmeters is the correct amount.
+func CheckGivenParams(params []interface{}, numParams int) error {
+	if len(params) != numParams {
+		return errors.New("The number of params is insufficient")
+	}
+	return nil
+}
+
+// GetFunctionParamsNum - Gets the given function number of parameters, and returns it or an error.
+func GetFunctionParamsNum(function reflect.Value) (int, error) {
+	if function.Type().NumIn() == 0 {
+		return 0, errors.New("The given function takes zero parameters")
+	}
+	return function.Type().NumIn(), nil
+}
+
+// ParseParamsIntoRVArray - Gets values from the params array, and puts their reflect value insside a []reflect.Value, and returns it.
+func ParseParamsIntoRVArray(params []interface{}) ([]reflect.Value, error) {
+	// Gets params from an interface array, and puts them in a []reflect.Value,
+	// to be used in the call function, of the reflect package
+	funcParams := make([]reflect.Value, len(params))
+	for k, param := range params {
+		funcParams[k] = reflect.ValueOf(param)
+	}
+	if len(funcParams) == 0 {
+		return nil, errors.New("Error parssing the functions parameters, from given array")
+	}
+
+	return funcParams, nil
+}
+
 // CallFunc - Calls the function with by the name specified in funcName
 func CallFunc(funcName string, params []interface{}) (interface{}, error) {
 	// Gets function as reflect.Value to perform reflection,
 	// to know things such as number of parameters
 	function := reflect.ValueOf(FuncsStorage[funcName])
 
+	numParams, err := GetFunctionParamsNum(function)
+	if err != nil {
+		return nil, err
+	}
+
 	// Checks if the passed parameters are more or less than the ones required
-	if len(params) != function.Type().NumIn() {
+	err = CheckGivenParams(params, numParams)
+	if err != nil {
 		return nil, errors.New("The number of params is insufficient")
 	}
 
 	// Gets al the parameters passed in params
-	// to be used in reflect.Call, as the called
-	funcParams := make([]reflect.Value, len(params))
-	for k, param := range params {
-		funcParams[k] = reflect.ValueOf(param)
+	// to be used in reflect.Call, as the called functions parameters
+	funcParams, err := ParseParamsIntoRVArray(params)
+	if err != nil {
+		return nil, err
 	}
 
 	// Call calls the function v with the input arguments in.
@@ -36,7 +73,7 @@ func CallFunc(funcName string, params []interface{}) (interface{}, error) {
 	return returned, nil
 }
 
-// ConvertToPrimitives -
+// ConvertToPrimitives - Converts the given values in x (extracted from JSON), to equivalent primitive golang data types.
 func ConvertToPrimitives(x []interface{}) ([]interface{}, error) {
 	converted := make([]interface{}, len(x))
 	for k, v := range x {
@@ -77,7 +114,7 @@ func ConvertToPrimitives(x []interface{}) ([]interface{}, error) {
 	return converted, nil
 }
 
-// GetCalledFuncs -
+// GetCalledFuncs - Gets the functions called in the current Dynamic-Action.
 func GetCalledFuncs(array []FunctionPath) string {
 	calledFunctions := ""
 	for _, v := range array {
@@ -90,15 +127,18 @@ func GetCalledFuncs(array []FunctionPath) string {
 	return calledFunctions
 }
 
-// RunFunctionsGetReturns -
+// RunFunctionsGetReturns - Runs the given functions in []FunctionPath, and returns the resulting function-call values.
 func RunFunctionsGetReturns(functions []FunctionPath) ([]interface{}, error) {
 	returns := make([]interface{}, len(functions))
 	// Iterates through all the queryed functions in the request
 	for k := range functions {
+		// Conver the given JSON function params, into golang primitives
 		funcParams, err := ConvertToPrimitives(functions[k].FunctionParams)
 		if err != nil {
 			DQGLogger.Panicf("Error: %s", err)
 		}
+
+		// Calls the function by the name specified insside the string
 		res, err := CallFunc(functions[k].FunctionCall, funcParams)
 		if err != nil {
 			DQGLogger.Println("Error: Either bad params or called function error")
@@ -106,6 +146,7 @@ func RunFunctionsGetReturns(functions []FunctionPath) ([]interface{}, error) {
 		}
 		returns[k] = res
 	}
+	// checks for no return values
 	if len(returns) == 0 {
 		return nil, errors.New("Error: functions returned nothing")
 	}
