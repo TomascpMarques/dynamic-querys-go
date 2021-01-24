@@ -1,4 +1,4 @@
-module DynamicQuerysGo
+module github.com/TomascpMarques/dynamic-querys-go
 
 go 1.15
 

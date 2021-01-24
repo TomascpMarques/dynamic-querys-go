@@ -1,7 +1,6 @@
 package main
 
 import (
-	"DynamicQuerysGo/actions"
 	"context"
 	"errors"
 	"flag"
@@ -9,6 +8,8 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/TomascpMarques/dynamic-querys-go/actions"
 
 	"github.com/gorilla/mux"
 )
