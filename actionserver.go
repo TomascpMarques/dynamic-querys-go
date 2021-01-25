@@ -47,7 +47,7 @@ func main() {
 	online := make(chan string, 1)
 
 	// server start message
-	actions.DQGLogger.Printf("Starting Server on addres: http://%s:%s/%s \n", "localhost", DQGPORT, "actions")
+	actions.DQGLogger.Printf("Starting Server on addres: http://%s:%s/%s \n", "127.0.0.1", DQGPORT, "actions")
 	// prevent server blocking
 	go func() {
 		online <- "Online"

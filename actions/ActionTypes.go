@@ -19,3 +19,18 @@ type FunctionPath struct {
 	FunctionCall   string        `json:"call"`
 	FunctionParams []interface{} `json:"params,omitempty"`
 }
+
+// Endpoint -
+type Endpoint struct {
+	funcName string
+	params   []interface{}
+}
+
+// BodyContents -
+type BodyContents struct {
+	ActionBody     string
+	Authentication [][]string
+	FuncCalls      [][]string
+	FuncArgs       [][]string
+	FuncsContent   []string
+}

@@ -2,8 +2,18 @@ package actions
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
+	"regexp"
 )
+
+// CheckRequestIsAction -
+func CheckRequestIsAction(action string) error {
+	if len(regexp.MustCompile(`^action:\n|^action:\s+\n`).FindAllString(action, -1)) == 0 {
+		return errors.New("Request sent is not an action")
+	}
+	return nil
+}
 
 // CheckGivenParams - checks if the number of parmeters is the correct amount.
 func CheckGivenParams(params []interface{}, numParams int) error {
@@ -73,83 +83,19 @@ func CallFunc(funcName string, params []interface{}) (interface{}, error) {
 	return returned, nil
 }
 
-// ConvertToPrimitives - Converts the given values in x (extracted from JSON), to equivalent primitive golang data types.
-func ConvertToPrimitives(x []interface{}) ([]interface{}, error) {
-	converted := make([]interface{}, len(x))
-	for k, v := range x {
-		varType := reflect.TypeOf(v.(interface{}))
-		if varType.String() == "[]interface {}" {
-			arrayType := reflect.TypeOf(v.([]interface{})[0])
-
-			switch arrayType.String() {
-			case "string":
-				newArray := make([]string, len(v.([]interface{})))
-				for j, u := range v.([]interface{}) {
-					newArray[j] = u.(string)
-				}
-				converted[k] = newArray
-				break
-			case "float64":
-				newArray := make([]float64, len(v.([]interface{})))
-				for j, u := range v.([]interface{}) {
-					newArray[j] = u.(float64)
-				}
-				converted[k] = newArray
-				break
-			default:
-				converted[k] = v
-				break
-			}
-
-			if converted[k] == nil {
-				return nil, errors.New("Error Converting")
-			}
-		} else {
-			converted[k] = reflect.ValueOf(v).Convert(varType).Interface()
-			if converted[k] == nil {
-				return nil, errors.New("Error Converting")
-			}
-		}
-	}
-	return converted, nil
-}
-
-// GetCalledFuncs - Gets the functions called in the current Dynamic-Action.
-func GetCalledFuncs(array []FunctionPath) string {
-	calledFunctions := ""
-	for _, v := range array {
-		calledFunctions += v.FunctionCall + "; "
-	}
-	if calledFunctions == "" {
-		return "Error: No functions called"
-	}
-
-	return calledFunctions
-}
-
 // RunFunctionsGetReturns - Runs the given functions in []FunctionPath, and returns the resulting function-call values.
-func RunFunctionsGetReturns(functions []FunctionPath) ([]interface{}, error) {
-	returns := make([]interface{}, len(functions))
-	// Iterates through all the queryed functions in the request
-	for k := range functions {
-		// Conver the given JSON function params, into golang primitives
-		funcParams, err := ConvertToPrimitives(functions[k].FunctionParams)
+func RunFunctionsGetReturns(functionCalMap []Endpoint) (map[string]interface{}, error) {
+	results := make(map[string]interface{}, 1)
+	for k, v := range functionCalMap {
+		res, err := CallFunc(v.funcName, v.params)
 		if err != nil {
-			DQGLogger.Panicf("Error: %s", err)
+			return nil, err
 		}
-
-		// Calls the function by the name specified insside the string
-		res, err := CallFunc(functions[k].FunctionCall, funcParams)
-		if err != nil {
-			DQGLogger.Println("Error: Either bad params or called function error")
-			continue
+		if _, ok := results[v.funcName]; ok {
+			DQGLogger.Printf("Function call repeat, sending second function call as -> %v <-\n", v.funcName+"_Redo"+fmt.Sprint(k))
+			results[v.funcName+"_Redo"+fmt.Sprint(k)] = res
 		}
-		returns[k] = res
+		results[v.funcName] = res
 	}
-	// checks for no return values
-	if len(returns) == 0 {
-		return nil, errors.New("Error: functions returned nothing")
-	}
-
-	return returns, nil
+	return results, nil
 }
