@@ -2,7 +2,7 @@
 
 ## __Intro__
 
-_DynamicQuerysGo_ is a simple project written in go, whith the intent to simulate a GraphQL like experience, in terms of querys and mutations. Here a request is called an action, which represents both an mutation and an query, the main purpose of these _actions_ is to resolve actions/requests to function calls, in a quick and simple way.
+_DynamicQuerysGo_ is a simple API project written in go, whith the intent to simulate a GraphQL like experience, in terms of querys and mutations. Here a request is called an action, which represents both an mutation and an query, the main purpose of these _actions_ is to resolve actions/requests to function calls, in a quick and simple way.
 
 ## __What I plan to add__ - (updated)
 
