@@ -7,7 +7,7 @@ import (
 	"regexp"
 )
 
-// CheckRequestIsAction -
+// CheckRequestIsAction - Verifys the request content contains an action
 func CheckRequestIsAction(action string) error {
 	if len(regexp.MustCompile(`^action:\n|^action:\s+\n`).FindAllString(action, -1)) == 0 {
 		return errors.New("Request sent is not an action")
@@ -84,18 +84,26 @@ func CallFunc(funcName string, params []interface{}) (interface{}, error) {
 }
 
 // RunFunctionsGetReturns - Runs the given functions in []FunctionPath, and returns the resulting function-call values.
+// Returns the called functions results as map[string]interface{}, and an error (nil if successfull)
 func RunFunctionsGetReturns(functionCalMap []Endpoint) (map[string]interface{}, error) {
-	results := make(map[string]interface{}, 1)
+	// Sets up the function results map
+	results := make(map[string]interface{}, 0)
+
+	// Iterates through the list of functions to call
 	for k, v := range functionCalMap {
-		res, err := CallFunc(v.funcName, v.params)
+		// Calls the current function in the list
+		// And returns the functions results and an error
+		res, err := CallFunc(v.FuncName, v.Params)
 		if err != nil {
 			return nil, err
 		}
-		if _, ok := results[v.funcName]; ok {
-			DQGLogger.Printf("Function call repeat, sending second function call as -> %v <-\n", v.funcName+"_Redo"+fmt.Sprint(k))
-			results[v.funcName+"_Redo"+fmt.Sprint(k)] = res
+		// Checks if the function as already been called
+		// If so, return this function call results with the function name <name>_Redo<current loop iteration>
+		if _, ok := results[v.FuncName]; ok {
+			DQGLogger.Printf("Function call repeat, sending second function call as -> %v <-\n", v.FuncName+"_Redo"+fmt.Sprint(k))
+			results[v.FuncName+"_Redo"+fmt.Sprint(k)] = res
 		}
-		results[v.funcName] = res
+		results[v.FuncName] = res
 	}
 	return results, nil
 }
