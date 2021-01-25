@@ -1,21 +1,16 @@
 package actions
 
-// Action - Defines the action as the body of the json action field,
-// 		    which as the body of the recieved action.
-type Action struct {
-	ActionBody ActionBody `json:"action"`
+// Endpoint - Represent the function called in the action schema, its name and parameters
+type Endpoint struct {
+	FuncName string        // Function name to call
+	Params   []interface{} // Parameters to be passed into the function
 }
 
-// ActionBody - Body of the action in itself, has all the fields
-//			   that are required for its decoding/functionality.
-type ActionBody struct {
-	Authentication string         `json:"auth,-"`
-	Functions      []FunctionPath `json:"func"`
-}
-
-// FunctionPath - Defines the function to be called (it's path/name),
-//				  and it's parameters.
-type FunctionPath struct {
-	FunctionCall   string        `json:"call"`
-	FunctionParams []interface{} `json:"params,omitempty"`
+// BodyContents - Represents the extende structure of the action body
+type BodyContents struct {
+	ActionBody     string     // Body of the action
+	Authentication [][]string // JWT auth tokens
+	FuncCalls      [][]string // Function names passed in the schema
+	FuncArgs       [][]string // Passed params in the schema
+	FuncsContent   []string   // Content of the " funcs: " section of the schema
 }

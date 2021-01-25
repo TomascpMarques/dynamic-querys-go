@@ -1,7 +1,6 @@
 package main
 
 import (
-	"DynamicQuerysGo/actions"
 	"context"
 	"errors"
 	"flag"
@@ -9,6 +8,8 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/TomascpMarques/dynamic-querys-go/actions"
 
 	"github.com/gorilla/mux"
 )
@@ -37,7 +38,7 @@ func main() {
 	srv := &http.Server{
 		Handler:      routerMux,
 		Addr:         "localhost:" + DQGPORT,
-		WriteTimeout: 5 * time.Second,
+		WriteTimeout: 3 * time.Second,
 		ReadTimeout:  5 * time.Second,
 		IdleTimeout:  5 * time.Second,
 	}
@@ -46,7 +47,7 @@ func main() {
 	online := make(chan string, 1)
 
 	// server start message
-	actions.DQGLogger.Printf("Starting Server on addres: http://%s:%s/%s \n", "localhost", DQGPORT, "actions")
+	actions.DQGLogger.Printf("Starting Server on addres: http://%s:%s/%s \n", "127.0.0.1", DQGPORT, "actions")
 	// prevent server blocking
 	go func() {
 		online <- "Online"
