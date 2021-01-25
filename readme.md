@@ -59,3 +59,51 @@ __OR__
     funcs:
     "ReverseString":
     "Hello GO",
+
+__Action calling multiple funcs:__ _(action schema oriented)_
+
+    action:
+    auth: "JWT EXAMPLE"
+    funcs:
+        "ReverseString":
+            "Hello GO",
+        "ReverseStringBool":
+            true,
+            "Hello GO", 
+        "TakeAnInterfaceArray":
+            [1231,14.13,true,"Muck","Nuck","{\\"name\\":123124}",],
+        "TakeAMap":
+            "{"age":43}",
+__Result:__ _(json)_
+    
+    {
+        "ReverseString": [
+            {
+                "reverssed": "OG olleH"
+            }
+        ],
+        "ReverseStringBool": [
+            {
+                "reversse": true,
+                "reverssed": "OG olleH"
+            }
+        ],
+        "TakeAMap": [
+            {
+                "age": 43
+            }
+        ],
+        "TakeAnInterfaceArray": [
+            [
+                1231,
+                14.13,
+                true,
+                "asdasd",
+                "asdasd",
+                {
+                    "name": 123124
+                }
+            ]
+        ]
+    }
+    
