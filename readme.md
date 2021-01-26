@@ -63,17 +63,17 @@ __OR__
 __Action calling multiple funcs:__ _(action schema oriented)_
 
     action:
-    auth: "JWT EXAMPLE"
-    funcs:
-        "ReverseString":
-            "Hello GO",
-        "ReverseStringBool":
-            true,
-            "Hello GO", 
-        "TakeAnInterfaceArray":
-            [1231,14.13,true,"Muck","Nuck","{\\"name\\":123124}",],
-        "TakeAMap":
-            "{"age":43}",
+        auth: "JWT EXAMPLE"
+        funcs:
+            "ReverseString":
+                "Hello GO",
+            "ReverseStringBool":
+                true,
+                "Hello GO", 
+            "TakeAnInterfaceArray":
+                [1231,14.13,true,"Muck","Nuck","{\\"name\\":123124}",],
+            "TakeAMap":
+                "{"age":43}",
 __Result:__ _(json)_
     
     {
