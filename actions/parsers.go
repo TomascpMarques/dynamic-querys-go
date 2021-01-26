@@ -21,13 +21,18 @@ func ParseActionBody(regex string, actionContents BodyContents) ([]Endpoint, err
 	ableToCall := reflect.ValueOf(FuncsStorage).MapKeys()
 	call := ""
 	for _, v := range ableToCall {
-		call += v.String()
+		call += v.String() + " "
 	}
 
 	// Iterates through the funcs: part of the action, and extracts it's functions allong with it's parameters
 	for k, v := range actionContents.FuncsContent {
+		check, err := CheckTypeAndConvert(v)
+		if err != nil {
+			DQGLogger.Println("Unable to convert to golang data type")
+			return nil, err
+		}
 		// Skips not existing function calls
-		if !strings.Contains(call, v[1:len(v)-2]) {
+		if !strings.Contains(call, reflect.ValueOf(check).String()) {
 			continue
 		}
 		// Checks if the current line is not a function call

@@ -23,7 +23,7 @@ var FuncsStorage = FuncMap{
 	//* !!! STATE YOUR FUNCS HERE !!! **//
 	//* You can implement your functions where-ever,
 	//* as long the program can get through the path to them
-	//* You can implement them in the folder funcendpoints, if you want everythin in the same place
+	//* You can implement them in the folder funcendpoints, if you want everything in the same place
 	//*
 	"ReverseString":        funcendpoints.ReverseString,
 	"ReverseStringBool":    funcendpoints.ReverseStringBool,
