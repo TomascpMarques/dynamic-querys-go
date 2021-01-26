@@ -2,7 +2,7 @@
 
 ## __Intro__
 
-_DynamicQuerysGo_ is a simple API project written in go, whith the intent to simulate a GraphQL like experience, in terms of querys and mutations. Here a request is called an action, which represents both an mutation and an query, the main purpose of these _actions_ is to resolve actions/requests to function calls, in a quick and simple way.
+_DynamicQuerysGo_ is a simple API project written in go, whith the intent to simulate a GraphQL like experience, in terms of interacting with the back-end of the service. Here a request is called an action, which represents both an mutation and a query, the main purpose of these _actions_ is to resolve actions/requests to function calls, in a quick and simple way.
 
 ## __What I plan to add__ - (updated)
 
@@ -20,7 +20,7 @@ Settings:
 
 Since DynamicQuerysGo is based arround a custom request schema (like in graph), conssider the following:
 
-1. Any form of rquest authentication, should be implemented by the user, the idea is to use JWT, but the auth fiedl only takes strings
+1. Any form of rquest authentication, should be implemented by the user, the idea is to use JWT, keep in mind that the auth fiedl only takes strings
 
 1. The beginning of the request sholud have the `action:` keyword, other wise the no functions will be called, and the action body will not be parssed.
 
