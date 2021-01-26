@@ -3,6 +3,7 @@ package actions
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -77,7 +78,7 @@ func ParseActionBody(regex string, actionContents BodyContents) ([]Endpoint, err
 		? 2. \d+\.\d+, 		  -> floats, check multiple times.
 		? 3. \d+,+ 			  -> integers, check multiple times.
 		? 4. true,+|false,+     -> booleans, check multiple times.
-		? 5. "\{\S+\}",+		  -> json-like strings ( "{\"name\":\"Golang\"}", or "{"age":43}", ), check multiple times.
+		? 5. \{\S+\},+		  -> json-like strings ( "{\"name\":\"Golang\"}", or "{"age":43}", ), check multiple times.
 		? 6. \[\S+\],+	  	  -> arrays of interfaces, check multiple times.
 */
 
@@ -92,7 +93,7 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 	if len(regexp.MustCompile(`^\[\S+\],$`).FindAllString(word, -1)) != 0 {
 		//temp := make([]interface{}, 0)
 		// Extracts all available data types, by their corresponding pattern
-		allTypesRegex := `"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|"\{\S+\}",+|\[\S+\],+`
+		allTypesRegex := `"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{\S+\},+|\[\S+\],+`
 		extractedValues := regexp.MustCompile(allTypesRegex).FindAllStringSubmatch(wordNoCotations, -1)
 
 		// Creates list to store the converted strings
@@ -128,9 +129,10 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 		return cnvt, nil
 	}
 	// Checks and converts a string to an interface array
-	if len(regexp.MustCompile(`"\{\S+\}"`).FindAllString(wordNoSemicolon, -1)) != 0 {
-		test := regexp.MustCompile(`\\`).ReplaceAllLiteralString(word[1:len(word)-2], "")
+	if len(regexp.MustCompile(`\{\S+\}`).FindAllString(wordNoSemicolon, -1)) != 0 {
+		test := regexp.MustCompile(`\\`).ReplaceAllLiteralString(word[0:len(word)-1], "")
 		var jsonBlob = []byte(test)
+		fmt.Println("-> ", test, wordNoSemicolon)
 		var cnvt map[string]interface{}
 		err := json.Unmarshal(jsonBlob, &cnvt)
 		if err != nil {
@@ -167,13 +169,13 @@ func ParseActionContents(request string) (BodyContents, error) {
 		DQGLogger.Println("! Attention no auth token was sent !")
 		result.Authentication = make([][]string, 0)
 	}
-	result.FuncCalls = regexp.MustCompile(`"\w+":|"\w+":\s+`).FindAllStringSubmatch(result.ActionBody, -1)
+	result.FuncCalls = regexp.MustCompile(`"\w+":\n|"\w+":\s+\n`).FindAllStringSubmatch(result.ActionBody, -1)
 	if len(result.FuncCalls) == 0 {
-		return BodyContents{}, errors.New("Error extracting function calls")
+		DQGLogger.Println(errors.New("Error extracting function calls"))
 	}
-	result.FuncArgs = regexp.MustCompile(`"\w+",\n|"\w+",|\[.+\]\n|\[.+\]\s+\n|\[.+\]\s+|\[.+\]|\d+,|\d+.\d+|"[a-zA-Z0-9_ ]+",`).FindAllStringSubmatch(result.ActionBody, -1)
+	result.FuncArgs = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{\S+\},+|\[\S+\],+`).FindAllStringSubmatch(result.ActionBody, -1)
 	if len(result.FuncArgs) == 0 {
-		return BodyContents{}, errors.New("Error extracting the functions arguments")
+		DQGLogger.Println(errors.New("Error extracting the functions arguments"))
 	}
 	result.FuncsContent = regexp.MustCompile(`\S+,|".+",|".+":`).FindAllString(result.ActionBody, -1)
 	if len(result.FuncsContent) == 0 {
