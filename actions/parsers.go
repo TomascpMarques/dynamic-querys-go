@@ -3,7 +3,6 @@ package actions
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -27,6 +26,7 @@ func ParseActionBody(regex string, actionContents BodyContents) ([]Endpoint, err
 
 	// Iterates through the funcs: part of the action, and extracts it's functions allong with it's parameters
 	for k, v := range actionContents.FuncsContent {
+
 		check, err := CheckTypeAndConvert(v)
 		if err != nil {
 			DQGLogger.Println("Unable to convert to golang data type")
@@ -43,6 +43,7 @@ func ParseActionBody(regex string, actionContents BodyContents) ([]Endpoint, err
 			// Sets up the parameters list
 			params := make([]interface{}, 0)
 			for _, j := range actionContents.FuncsContent[k+1:] {
+
 				// Skips iteration if curret line is a function call
 				// after skiping, all the paremeters found
 				// are attributted to the previous function call
@@ -78,8 +79,8 @@ func ParseActionBody(regex string, actionContents BodyContents) ([]Endpoint, err
 		? 2. \d+\.\d+, 		  -> floats, check multiple times.
 		? 3. \d+,+ 			  -> integers, check multiple times.
 		? 4. true,+|false,+     -> booleans, check multiple times.
-		? 5. \{\S+\},+		  -> json-like strings ( "{\"name\":\"Golang\"}", or "{"age":43}", ), check multiple times.
-		? 6. \[\S+\],+	  	  -> arrays of interfaces, check multiple times.
+		? 5. \{.\},+		  -> json-like strings ( "{\"name\":\"Golang\"}", or "{"age":43}", ), check multiple times.
+		? 6. \[.\],+	  	  -> arrays of interfaces, check multiple times.
 */
 
 /*CheckTypeAndConvert - Takes a string and compares it to a number of regex patterns, each representing golang data types,
@@ -90,10 +91,10 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 	wordNoCotations := word[1 : len(word)-1]
 	wordNoSemicolon := word[:len(word)-1]
 	// Checks string to see if its possible to convert into an array of interfaces
-	if len(regexp.MustCompile(`^\[\S+\],$`).FindAllString(word, -1)) != 0 {
+	if len(regexp.MustCompile(`^\[.+\],$`).FindAllString(word, -1)) != 0 {
 		//temp := make([]interface{}, 0)
 		// Extracts all available data types, by their corresponding pattern
-		allTypesRegex := `"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{\S+\},+|\[\S+\],+`
+		allTypesRegex := `"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+`
 		extractedValues := regexp.MustCompile(allTypesRegex).FindAllStringSubmatch(wordNoCotations, -1)
 
 		// Creates list to store the converted strings
@@ -129,10 +130,10 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 		return cnvt, nil
 	}
 	// Checks and converts a string to an interface array
-	if len(regexp.MustCompile(`\{\S+\}`).FindAllString(wordNoSemicolon, -1)) != 0 {
+	if len(regexp.MustCompile(`\{.+\}`).FindAllString(wordNoSemicolon, -1)) != 0 {
 		test := regexp.MustCompile(`\\`).ReplaceAllLiteralString(word[0:len(word)-1], "")
 		var jsonBlob = []byte(test)
-		fmt.Println("-> ", test, wordNoSemicolon)
+
 		var cnvt map[string]interface{}
 		err := json.Unmarshal(jsonBlob, &cnvt)
 		if err != nil {
@@ -173,11 +174,11 @@ func ParseActionContents(request string) (BodyContents, error) {
 	if len(result.FuncCalls) == 0 {
 		DQGLogger.Println(errors.New("Error extracting function calls"))
 	}
-	result.FuncArgs = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{\S+\},+|\[\S+\],+`).FindAllStringSubmatch(result.ActionBody, -1)
+	result.FuncArgs = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+`).FindAllStringSubmatch(result.ActionBody, -1)
 	if len(result.FuncArgs) == 0 {
 		DQGLogger.Println(errors.New("Error extracting the functions arguments"))
 	}
-	result.FuncsContent = regexp.MustCompile(`\S+,|".+",|".+":`).FindAllString(result.ActionBody, -1)
+	result.FuncsContent = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+|".+",|".+":`).FindAllString(result.ActionBody, -1)
 	if len(result.FuncsContent) == 0 {
 		return BodyContents{}, errors.New("Error extracting the <funcs:> content")
 	}
