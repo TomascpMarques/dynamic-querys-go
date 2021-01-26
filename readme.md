@@ -32,7 +32,7 @@ Since DynamicQuerysGo is based arround a custom request schema (like in graph), 
       Strings            | "Muck Nuck",
       Float64            | 142.6356,
       Booleans           | true / false
-      map\[string\]interface{} (to decode json) | "{\\"name\\":\\"Muck Nuck\\"}", OR "{"name":123124}",
+      map\[string\]interface{} (to decode json) | {"name":"Muck Nuck"}",
       \[ \]interface{} (multi/single type arrays)|  \[1231,14.13,true,"asdasd",\],
 
     
