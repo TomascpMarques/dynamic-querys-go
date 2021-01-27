@@ -83,9 +83,10 @@ func ParseActionBody(regex string, actionContents BodyContents) ([]Endpoint, err
 		? 6. \[.\],+	  	  -> arrays of interfaces, check multiple times.
 */
 
-/*CheckTypeAndConvert - Takes a string and compares it to a number of regex patterns, each representing golang data types,
-if the pattern and string match, the string will be converted to the represented data type.
-The order of regex comparisson is important in some cases, such as in strings, json-like strings ("{\"name\":\"Golang\"}").
+/*
+CheckTypeAndConvert - Takes a string and compares it to a number of regex patterns, each representing golang data types,
+	if the pattern and string match, the string will be converted to the represented data type.
+	The order of regex comparisson is important in some cases, such as in strings, json-like strings ("{\"name\":\"Golang\"}").
 */
 func CheckTypeAndConvert(word string) (interface{}, error) {
 	wordNoCotations := word[1 : len(word)-1]
