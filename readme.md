@@ -1,4 +1,3 @@
-[![Go Reference](https://pkg.go.dev/badge/pkg.go.dev/github.com/TomascpMarques/dynamic-querys-go.svg)](https://pkg.go.dev/pkg.go.dev/github.com/TomascpMarques/dynamic-querys-go)
 # DynamicQuerysGo / GoActions
 
 ## __Intro__
