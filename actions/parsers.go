@@ -143,7 +143,7 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 		return cnvt, nil
 	}
 	// Checks and properly formatts the string (pops the <""> and the <,>)
-	if len(regexp.MustCompile(`^"[a-zA-Z0-9_ ]+"$`).FindAllString(wordNoSemicolon, -1)) != 0 {
+	if len(regexp.MustCompile(`^".+"$`).FindAllString(wordNoSemicolon, -1)) != 0 {
 		cnvt := word[1 : len(word)-2]
 		return cnvt, nil
 	}
