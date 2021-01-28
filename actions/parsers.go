@@ -167,8 +167,6 @@ func ParseActionContents(request string) (BodyContents, error) {
 		return BodyContents{}, errors.New("Error extracting the action body")
 	}
 	result.Authentication = regexp.MustCompile(`auth: ".+"|auth: ".+" +`).FindAllStringSubmatch(result.ActionBody, -1)
-	result.Authentication = regexp.MustCompile(`"\w+"`).FindAllString(result.Authentication[0][0], 1)[0]
-	result.Authentication = result.Authentication[1 : len(result.Authentication)-1]
 	if len(result.Authentication) == 0 {
 		DQGLogger.Println("! Attention no auth token was sent !")
 		result.Authentication = make([][]string, 0)
