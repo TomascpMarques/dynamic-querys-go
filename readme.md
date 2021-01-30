@@ -8,8 +8,6 @@ _DynamicQuerysGo_ is a simple API project written in go, whith the intent to sim
 
 1. __DONE!__ Reduce the request/action foot-print, sent to the server. Make it more readable, like graph, or a docker compose file, type of readable.
 
-1. ~~Add authentication middleware, in the format of JSON WebTokens.~~
-
 1. __DONE!__ Make my own request parser to suport objective one.
 
 ## __Things to keep in mind__ - v.1.1-Release
@@ -33,12 +31,12 @@ Since DynamicQuerysGo is based arround a custom request schema (like in graph), 
       Float64            | 142.6356,
       Booleans           | true / false
       map\[string\]interface{} (to decode json) | {"name":"Muck Nuck"},
-      \[ \]interface{} (multi/single type arrays)|  \[1231,14.13,true,"asdasd",\],
+      \[ \]interface{} (multi/single type arrays)|  \[1231,14.13,true,"asdasd",{"name":"Muck Nuck"},\],
 
     
 1. The action schema should be written in the following these steps:
     * First line is for the keyword `action:`.
-    * Second line can ommit the `auth:` field, but shouldn't _(unlless you don't want any authentication through JWTs)_.
+    * Second line can ommit the `auth:` field, your choice
     * The function calls are specified by `"functionName":` and the next lines are the arguments, one line per each argument passed.
     * The only indentation to worry about is in the paremeter passing for functions, you could write the action with no indentation but the parameters need to be in their own singular lines.
 
@@ -47,7 +45,7 @@ Since DynamicQuerysGo is based arround a custom request schema (like in graph), 
 __Action calling function ReverseString:__ _(action schema oriented)_
 
     action:
-        auth: "JWT EXAMPLE"
+        auth: "JWT EXAMPLE" // optional
         funcs:
             "ReverseString":
                 "Hello GO",
@@ -63,7 +61,7 @@ __OR__
 __Action calling multiple funcs:__ _(action schema oriented)_
 
     action:
-        auth: "JWT EXAMPLE"
+        auth: "JWT EXAMPLE" // optional
         funcs:
             "ReverseString":
                 "Hello GO",
@@ -73,7 +71,7 @@ __Action calling multiple funcs:__ _(action schema oriented)_
             "TakeAnInterfaceArray":
                 [1231,14.13,true,"Muck","Nuck","{\\"name\\":123124}",],
             "TakeAMap":
-                "{"age":43}",
+                {"age":43},
 __Result:__ _(json)_
     
     {
