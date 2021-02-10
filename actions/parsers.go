@@ -75,12 +75,14 @@ func ParseActionBody(regex string, actionContents BodyContents) ([]Endpoint, err
 
 /*
 	* Regexp Patterns:
-		? 1. "[a-zA-Z0-9_ ]+",+ -> strings insside quotations (include spaces), check multiple times.
-		? 2. \d+\.\d+, 		  -> floats, check multiple times.
-		? 3. \d+,+ 			  -> integers, check multiple times.
-		? 4. true,+|false,+     -> booleans, check multiple times.
-		? 5. \{.\},+		  -> json-like strings ( "{\"name\":\"Golang\"}", or "{"age":43}", ), check multiple times.
-		? 6. \[.\],+	  	  -> arrays of interfaces, check multiple times.
+		? 1. "[a-zA-Z0-9_ ]+",+ -->  strings insside quotations (include spaces), check multiple times.
+		? 2. \d+\.\d+, 		    -->  floats, check multiple times.
+		? 3. \d+,+ 			    -->  integers, check multiple times.
+		? 4. true,+|false,+     -->  booleans, check multiple times.
+		? 5. \{.\},+		    -->  json-like strings ( "{\"name\":\"Golang\"}", or "{"age":43}", ), check multiple times.
+		? 6. \[.\],+	  	    -->  arrays of interfaces, check multiple times.
+		? 7. ^b".+"$		    -->  strings that will be translated to byte arrays
+		? 8. ^b\{.+\}$			-->  json values that will be translated to byte arrays
 */
 
 /*
@@ -95,7 +97,7 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 	if len(regexp.MustCompile(`^\[.+\],$`).FindAllString(word, -1)) != 0 {
 		//temp := make([]interface{}, 0)
 		// Extracts all available data types, by their corresponding pattern
-		allTypesRegex := `"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+`
+		allTypesRegex := `".+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+`
 		extractedValues := regexp.MustCompile(allTypesRegex).FindAllStringSubmatch(wordNoCotations, -1)
 
 		// Creates list to store the converted strings
@@ -112,6 +114,16 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 			convertedList = append(convertedList, converted)
 		}
 		return convertedList, nil
+	}
+	// CHecks and converts a string to byte array
+	if len(regexp.MustCompile(`^b".+"$`).FindAllString(wordNoSemicolon, -1)) != 0 {
+		cnvt := []byte(wordNoSemicolon[2 : len(wordNoSemicolon)-1])
+		return cnvt, nil
+	}
+	// CHecks and converts a json string to a byte array
+	if len(regexp.MustCompile(`^b\{.+\}$`).FindAllString(wordNoSemicolon, -1)) != 0 {
+		cnvt := []byte(wordNoSemicolon[1:])
+		return cnvt, nil
 	}
 	// Checks and converts a string to a integer
 	if len(regexp.MustCompile(`^\d+$`).FindAllString(wordNoSemicolon, -1)) != 0 {
@@ -159,6 +171,8 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 	return nil, errors.New("Not able to translate into go primitive (bad parameter or no regex hit)")
 }
 
+//b\{.+\},+
+
 // ParseActionContents - Separates the action into its dedicated content parts
 func ParseActionContents(request string) (BodyContents, error) {
 	var result BodyContents
@@ -175,11 +189,11 @@ func ParseActionContents(request string) (BodyContents, error) {
 	if len(result.FuncCalls) == 0 {
 		DQGLogger.Println(errors.New("Error extracting function calls"))
 	}
-	result.FuncArgs = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+`).FindAllStringSubmatch(result.ActionBody, -1)
+	result.FuncArgs = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+|b".+",|b\{.+\},`).FindAllStringSubmatch(result.ActionBody, -1)
 	if len(result.FuncArgs) == 0 {
 		DQGLogger.Println(errors.New("Error extracting the functions arguments"))
 	}
-	result.FuncsContent = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+|".+",|".+":`).FindAllString(result.ActionBody, -1)
+	result.FuncsContent = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+|".+",|".+":|b\{.+\},+|b".+",|b\{.+\},`).FindAllString(result.ActionBody, -1)
 	if len(result.FuncsContent) == 0 {
 		return BodyContents{}, errors.New("Error extracting the <funcs:> content")
 	}

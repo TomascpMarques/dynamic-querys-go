@@ -1,5 +1,7 @@
 package funcendpoints
 
+import "fmt"
+
 // ReverseString -
 func ReverseString(str string) map[string]interface{} {
 	reverssed := ""
@@ -37,4 +39,16 @@ func TakeAInterfaceArray(array []interface{}) []interface{} {
 // TakeAMap -
 func TakeAMap(array map[string]interface{}) map[string]interface{} {
 	return array
+}
+
+// TestBytes -
+func TestBytes(x ...[]byte) []string {
+	vetor := make([]string, 0)
+
+	for _, v := range x {
+		fmt.Println(v)
+		vetor = append(vetor, string(v))
+	}
+
+	return vetor
 }
