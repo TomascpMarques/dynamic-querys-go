@@ -91,19 +91,25 @@ func RunFunctionsGetReturns(functionCalMap []Endpoint) (map[string]interface{}, 
 
 	// Iterates through the list of functions to call
 	for k, v := range functionCalMap {
+		// Defines the name of the return of the called func
+		callName := v.FuncName
 		// Calls the current function in the list
 		// And returns the functions results and an error
 		res, err := CallFunc(v.FuncName, v.Params)
 		if err != nil {
 			return nil, err
 		}
+
 		// Checks if the function as already been called
-		// If so, return this function call results with the function name <name>_Redo<current loop iteration>
-		if _, ok := results[v.FuncName]; ok {
-			DQGLogger.Printf("Function call repeat, sending second function call as -> %v <-\n", v.FuncName+"_Redo"+fmt.Sprint(k))
-			results[v.FuncName+"_Redo"+fmt.Sprint(k)] = res
+		// If so, return this function call results with the function name <name>_v<current loop iteration>
+		// The v is for versioning of function cals, droping the concept of redoing functions with other values.
+		// Even if the func is called with the same values, it will be conssiderated another version.
+		if _, ok := results[callName]; ok {
+			DQGLogger.Printf("Function call repeat, sending second function call as -> %v <-\n", v.FuncName+"_v"+fmt.Sprint(k))
+			callName = fmt.Sprintf("%s_V%s", v.FuncName, fmt.Sprint(k))
 		}
-		results[v.FuncName] = res
+
+		results[callName] = res
 	}
 	return results, nil
 }
