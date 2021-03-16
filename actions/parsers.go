@@ -61,7 +61,7 @@ func ParseActionBody(regex string, actionContents BodyContents) ([]Endpoint, err
 			// Checks if the number of params insside params is equal to the requeired number to call the function
 			pnum, err := GetFunctionParamsNum(reflect.ValueOf(FuncsStorage[v[1:len(v)-2]]))
 			if err != nil || len(params) != pnum {
-				return nil, errors.New("Bad Parameters")
+				return nil, errors.New("bad parameters")
 			}
 			// If all went well, a function call and its params will be appended in the functionCalMap, and returned
 			functionCalMap = append(functionCalMap, Endpoint{
@@ -107,7 +107,7 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 			// Cals its parent function to make use of the already implemented regexp check/convert
 			converted, err := CheckTypeAndConvert(v[0])
 			if err != nil {
-				return nil, errors.New("Error Converting")
+				return nil, errors.New("error converting")
 			}
 
 			// Adds the param converted from a string into a list to be returned
@@ -129,7 +129,7 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 	if len(regexp.MustCompile(`^\d+$`).FindAllString(wordNoSemicolon, -1)) != 0 {
 		cnvt, err := strconv.Atoi(wordNoSemicolon)
 		if err != nil {
-			return nil, errors.New("Error Converting to int")
+			return nil, errors.New("error converting to int")
 		}
 		return cnvt, nil
 	}
@@ -137,7 +137,7 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 	if len(regexp.MustCompile(`^\d+\.\d+$`).FindAllString(wordNoSemicolon, -1)) != 0 {
 		cnvt, err := strconv.ParseFloat(wordNoSemicolon, 64)
 		if err != nil {
-			return nil, errors.New("Error Converting to float64")
+			return nil, errors.New("error converting to float64")
 
 		}
 		return cnvt, nil
@@ -150,7 +150,7 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 		var cnvt map[string]interface{}
 		err := json.Unmarshal(jsonBlob, &cnvt)
 		if err != nil {
-			return nil, errors.New("Error Converting to map[string]interface{}")
+			return nil, errors.New("error converting to map[string]interface{}")
 		}
 		return cnvt, nil
 	}
@@ -163,12 +163,12 @@ func CheckTypeAndConvert(word string) (interface{}, error) {
 	if len(regexp.MustCompile(`^true$|^false$|true|false`).FindAllString(wordNoSemicolon, -1)) != 0 {
 		cnvt, err := strconv.ParseBool(wordNoSemicolon)
 		if err != nil {
-			return nil, errors.New("Error Converting to boolean")
+			return nil, errors.New("error converting to boolean")
 		}
 		return cnvt, nil
 	}
 	DQGLogger.Println("No regexp was hit!")
-	return nil, errors.New("Not able to translate into go primitive (bad parameter or no regex hit)")
+	return nil, errors.New("not able to translate into go primitive (bad parameter or no regex hit)")
 }
 
 //b\{.+\},+
@@ -178,7 +178,7 @@ func ParseActionContents(request string) (BodyContents, error) {
 	var result BodyContents
 	result.ActionBody = strings.TrimSpace(request[7:])
 	if len(result.ActionBody) == 0 {
-		return BodyContents{}, errors.New("Error extracting the action body")
+		return BodyContents{}, errors.New("error extracting the action body")
 	}
 	result.Authentication = regexp.MustCompile(`auth: ".+"|auth: ".+" +`).FindAllStringSubmatch(result.ActionBody, -1)
 	if len(result.Authentication) == 0 {
@@ -187,15 +187,15 @@ func ParseActionContents(request string) (BodyContents, error) {
 	}
 	result.FuncCalls = regexp.MustCompile(`"\w+":\n|"\w+":\s+\n`).FindAllStringSubmatch(result.ActionBody, -1)
 	if len(result.FuncCalls) == 0 {
-		DQGLogger.Println(errors.New("Error extracting function calls"))
+		DQGLogger.Println(errors.New("error extracting function calls"))
 	}
 	result.FuncArgs = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+|b".+",|b\{.+\},`).FindAllStringSubmatch(result.ActionBody, -1)
 	if len(result.FuncArgs) == 0 {
-		DQGLogger.Println(errors.New("Error extracting the functions arguments"))
+		DQGLogger.Println(errors.New("error extracting the functions arguments"))
 	}
 	result.FuncsContent = regexp.MustCompile(`"[a-zA-Z0-9_ ]+",+|\d+\.\d+,+|\d+,+|true,+|false,+|\{.+\},+|\[.+\],+|".+",|".+":|b\{.+\},+|b".+",|b\{.+\},`).FindAllString(result.ActionBody, -1)
 	if len(result.FuncsContent) == 0 {
-		return BodyContents{}, errors.New("Error extracting the <funcs:> content")
+		return BodyContents{}, errors.New("error extracting the <funcs:> content")
 	}
 
 	return result, nil

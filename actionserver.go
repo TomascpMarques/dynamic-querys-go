@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/TomascpMarques/dynamic-querys-go/actions"
@@ -28,7 +29,7 @@ func main() {
 
 	// flag setup fo graceful-shutdown
 	var wait time.Duration
-	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
+	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "gracefully wait for existing connections to finish - e.g. 15s or 1m")
 	flag.Parse()
 
 	routerMux := mux.NewRouter()
@@ -71,7 +72,7 @@ func main() {
 	c := make(chan os.Signal, 1)
 	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C) or SIGKILL,
 	// SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
-	signal.Notify(c, os.Interrupt, os.Kill)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 	// Block until we receive our signal.
 	<-c
@@ -90,7 +91,7 @@ func main() {
 // FunctionHooksHealthCheck -
 func FunctionHooksHealthCheck() error {
 	if len(actions.FuncsStorage) == 0 {
-		return errors.New("There are no functions to be used as endpoints")
+		return errors.New("there are no functions to be used as endpoints")
 	}
 	return nil
 }
