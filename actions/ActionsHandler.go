@@ -29,7 +29,6 @@ var FuncsStorage = FuncMap{
 	"ReverseStringBool":    funcendpoints.ReverseStringBool,
 	"TakeAnInterfaceArray": funcendpoints.TakeAInterfaceArray,
 	"TakeAMap":             funcendpoints.TakeAMap,
-	"TestBytes":            funcendpoints.TestBytes,
 }
 
 // Handler - Handles all of the requests coming into the server
@@ -94,5 +93,4 @@ func Handler(rw http.ResponseWriter, r *http.Request) {
 	rw.Write([]byte(send))
 
 	DQGLogger.Println("No errors, all good")
-	return
 }

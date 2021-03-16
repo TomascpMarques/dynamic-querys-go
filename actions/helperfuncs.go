@@ -10,7 +10,7 @@ import (
 // CheckRequestIsAction - Verifys the request content contains an action
 func CheckRequestIsAction(action string) error {
 	if len(regexp.MustCompile(`^action:\n|^action:\s+\n`).FindAllString(action, -1)) == 0 {
-		return errors.New("Request sent is not an action")
+		return errors.New("request sent is not an action")
 	}
 	return nil
 }
@@ -18,7 +18,7 @@ func CheckRequestIsAction(action string) error {
 // CheckGivenParams - checks if the number of parmeters is the correct amount.
 func CheckGivenParams(params []interface{}, numParams int) error {
 	if len(params) != numParams {
-		return errors.New("The number of params is insufficient")
+		return errors.New("the number of params is insufficient")
 	}
 	return nil
 }
@@ -26,7 +26,7 @@ func CheckGivenParams(params []interface{}, numParams int) error {
 // GetFunctionParamsNum - Gets the given function number of parameters, and returns it or an error.
 func GetFunctionParamsNum(function reflect.Value) (int, error) {
 	if function.Type().NumIn() == 0 {
-		return 0, errors.New("The given function takes zero parameters")
+		return 0, errors.New("the given function takes zero parameters")
 	}
 	return function.Type().NumIn(), nil
 }
@@ -40,7 +40,7 @@ func ParseParamsIntoRVArray(params []interface{}) ([]reflect.Value, error) {
 		funcParams[k] = reflect.ValueOf(param)
 	}
 	if len(funcParams) == 0 {
-		return nil, errors.New("Error parssing the functions parameters, from given array")
+		return nil, errors.New("error parssing the functions parameters, from given array")
 	}
 
 	return funcParams, nil
@@ -60,7 +60,7 @@ func CallFunc(funcName string, params []interface{}) (interface{}, error) {
 	// Checks if the passed parameters are more or less than the ones required
 	err = CheckGivenParams(params, numParams)
 	if err != nil {
-		return nil, errors.New("The number of params is insufficient")
+		return nil, errors.New("the number of params is insufficient")
 	}
 
 	// Gets al the parameters passed in params
@@ -87,7 +87,7 @@ func CallFunc(funcName string, params []interface{}) (interface{}, error) {
 // Returns the called functions results as map[string]interface{}, and an error (nil if successfull)
 func RunFunctionsGetReturns(functionCalMap []Endpoint) (map[string]interface{}, error) {
 	// Sets up the function results map
-	results := make(map[string]interface{}, 0)
+	results := make(map[string]interface{})
 
 	// Iterates through the list of functions to call
 	for k, v := range functionCalMap {
